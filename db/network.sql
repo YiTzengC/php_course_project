@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS Network_Connection;
 CREATE DATABASE Network_Connection; 
 USE Network_Connection; 
 CREATE TABLE `users` (
@@ -5,6 +6,7 @@ CREATE TABLE `users` (
   `name` VARCHAR(100) NOT NULL,
   `email` VARCHAR (100) NOT NULL,
   `location` VARCHAR (100) NOT NULL,
+  `password` VARCHAR (32) NOT NULL,
   PRIMARY KEY (user_id)
 ); 
 CREATE TABLE `skills` (

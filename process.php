@@ -14,6 +14,7 @@
     $id = filter_input(INPUT_POST, 'user_id');
     $name = filter_input(INPUT_POST, 'name');
     $location = filter_input(INPUT_POST, 'location');
+    $user_password = filter_input(INPUT_POST, 'password');
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $skills = filter_input(INPUT_POST, 'skills', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
 
@@ -23,9 +24,16 @@
         $ok = false;
 
     }
-    if (empty($location)){
+    else if (empty($location)){
         echo "<p>Please provide location! </p>";
         $ok = false;
+    }
+    else if (empty($user_password) && empty($id)){
+        echo "<p>Please provide password! </p>";
+        $ok = false;
+    }
+    else {
+        $user_password = md5($user_password);
     }
     if(!empty($skills)){
         foreach($skills as $skill){
@@ -54,11 +62,12 @@
                 $statement->closeCursor(); 
             }
             else{
-                $sql = "INSERT INTO users (name, location, email) VALUES (:name, :location, :email)";
+                $sql = "INSERT INTO users (name, location, email, password) VALUES (:name, :location, :email, :password)";
                 $statement = $db->prepare($sql);
                 $statement->bindParam(':name', $name);
                 $statement->bindParam(':location', $location);
                 $statement->bindParam(':email', $email);
+                $statement->bindParam(':password', $user_password);
                 $statement->execute(); 
                 $id = $db->lastInsertId();
                 $statement ->closeCursor();

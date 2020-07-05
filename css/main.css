@@ -1,7 +1,3 @@
-.skill {
-    margin-bottom: 1em;
-}
-
-body main form {
-    width: 50%;
+body {
+    background-color: aqua;
 }
