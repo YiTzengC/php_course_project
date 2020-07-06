@@ -21,15 +21,7 @@ main {
 }
 #intro p {
     color: white;
-    text-align: center;
 }
 #intro a{
     color: white;
-}
-#intro .btn-align{
-    text-align: center;
-    padding-top: 2em;
-}
-#intro a:hover {
-    color: black;
 }

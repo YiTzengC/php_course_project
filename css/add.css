@@ -1,0 +1,25 @@
+
+body {
+    background-image: url("../imgs/woman-wearing-gray-long-sleeved-shirt-and-black-black-1008000.jpg");
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+main {
+    padding: 4em 0;
+    
+}
+form {
+    width: 55%;
+    background-color: #353535a9;
+    margin: auto auto;
+    border-radius: 1em;
+    padding: 4em 12em;
+}
+form label {
+    color: white;
+}
+.btn-align{
+    text-align: center;
+    padding-top: .5em;
+}

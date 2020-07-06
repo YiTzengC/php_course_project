@@ -1,0 +1,21 @@
+body {
+   background: linear-gradient(#71cbcf, #3C6E71);
+   background-repeat: no-repeat;
+}
+main {
+    padding: 3em 0 30em 0;
+    
+}
+.tbl {
+    background-color: rgba(128, 128, 128, 0.74);
+    width: 90%;
+    margin: auto auto;
+    border-radius: .5em;
+    padding: 1em 1em;
+}
+table tr {
+    color: white;
+}
+table td div {
+    color: #3C6E71;
+}

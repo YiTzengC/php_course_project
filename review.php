@@ -4,8 +4,8 @@
         <meta charset="utf-8">
         <title>Course Project</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-        <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/header.css">
+        <link rel="stylesheet" href="css/review.css">
         <link rel="stylesheet" href="css/footer.css">
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -17,16 +17,10 @@
         ?>
         <main>
             <section id="intro">
-                <h2>WELCOME</h2>
+                <h2>Project Review</h2>
                 <p>
-                    We are contributed to connect specialists in the world.
+                The most tricky one is that I want to invoke functions while I click some buttons. The only way to accomplish in PHP is using POST or GET, but I do not want to render pages again. It was not as useful as involking onclick function in JavaScript. I spent lots of time solving problems of functions. Fortunately, all of them worked well. Except for functions, I did not encounter serious issues. 
                 </p>
-                <p>
-                Want to be a part of us?
-                </p>
-                <div class="btn-align">
-                    <a class="btn btn-outline-light" href="add.php">Connect Now</a>
-                </div>
             </section>
         </main>
         <?php

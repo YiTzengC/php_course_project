@@ -1,19 +1,15 @@
+<?php ob_start() ?>
 <?php
     $correct_password = true;
     try {
-        //run script of connect.php
+        // fetch all records from users
         require_once('db/connect.php');
-        // instantiate a variable called sql to hold query to be executed for mysql
         $sql = "SELECT * FROM users;";
-        //papare the query and return a PDO statement object
         $statement = $db->prepare($sql); 
-        // execute the query
         $statement->execute(); 
-        // disconnect from database
         $users = $statement->fetchAll();
-        
         $statement ->closeCursor(); 
-
+        // fetch all records from skills by primary key
         $skills = null;
         foreach($users as $user){
             $sql = "SELECT skill_name FROM skills WHERE owner = :owner;";
@@ -27,7 +23,6 @@
 
     } catch (PDOException $e) {
         $error_message = $e->getMessage();
-        //show error message to user
         echo $error_message;
     }
 ?>
@@ -40,27 +35,19 @@
     <title>Course Project</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Piedra&family=Quicksand&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/view.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/footer.css">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
   </head>
     <body>
-        <div class="container">
-            <header>
-                <h1>PROFILES</h1>
-                <nav>
-                <ul class="nav justify-content-center">
-                    <li class="nav-item">
-                      <a class="nav-link active" href="index.php">Register</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link active" href="#">View</a>
-                    </li>
-                </ul>
-            </nav>
-            </header>
+        <?php
+            require_once('header.php');
+        ?>
             <main>
+                <div class="tbl">
                 <?php 
                     echo "
                     <table class='table table-striped'>
@@ -75,7 +62,7 @@
                         </thead>
                         <tbody>";
                         foreach($users as $index=>$user){
-                            echo "<tr><th scope='row'>".($index+1)."</th><td>" . $user['name'] . "</td><td>" . $user['email'] . "</td><td>".$user['location']. "</td><td><button class='btn btn-primary' type='button' data-toggle='collapse' data-target='#skill_".$index."' aria-expanded='false' aria-controls='skill_".$index."'>Show</button></td><td><a href='db/remove.php?id=" . $user['user_id'] . "'> Delete</a></td><td><button class='btn btn-primary' type='button' data-toggle='modal' data-target='#passwordModal' id='user_".$user['user_id']."' onclick='getId(event)'>Edit</button></td></tr>";
+                            echo "<tr><th scope='row'>".($index+1)."</th><td>" . $user['name'] . "</td><td>" . $user['email'] . "</td><td>".$user['location']. "</td><td><button class='btn btn-light' type='button' data-toggle='collapse' data-target='#skill_".$index."' aria-expanded='false' aria-controls='skill_".$index."'>Show</button></td><td><a class='btn btn-outline-light' data-toggle='modal' data-target='#passwordModal' id='delete_".$user['user_id']."' onclick='deleteInfo(event)'> Delete</a></td><td><button class='btn btn-light' type='button' data-toggle='modal' data-target='#passwordModal' id='user_".$user['user_id']."' onclick='editInfo(event)'>Edit</button></td></tr>";
                             echo "<tr class='collapse' id='skill_".$index."'>
                             <td colspan='7'><div class='card card-body'><ul class='list-group list-group-horizontal'>";
                             if(!empty($skills[$user['user_id']])){
@@ -88,13 +75,12 @@
                         echo "</tbody>
                     </table>";
                 ?>
-                <?php 
+                <?php
                     if (isset($_POST['submit'])) {
                         $user_password = md5($_POST['password']);
                         $user_id = $_POST['user_id'];
                         try {
                             $sql = "SELECT * FROM users WHERE user_id = :user_id AND password = :password;";
-                            //papare the query and return a PDO statement object
                             $statement = $db->prepare($sql);
                             $statement->bindParam(':user_id', $user_id);
                             $statement->bindParam(':password', $user_password);
@@ -105,7 +91,12 @@
                                 $correct_password = false;
                             }
                             else{
-                                header('location: index.php?id='.$user_id);
+                                if($_POST['action'] == 'edit'){
+                                    header('location: add.php?id='.$user_id);
+                                }
+                                else{
+                                    header('location: db/remove.php?id='.$user_id);
+                                }
                             }
                         }catch(PDOException $e){
                             echo "
@@ -131,17 +122,24 @@
                         }
                     }
                 ?>
+                </div>
                 <script> 
-                    function getId($event){
+                    function editInfo($event){
                         const user_id = $event.target.id.substring($event.target.id.length-1, $event.target.id.length);
                         document.getElementById("user_id").value = user_id;
                         document.getElementById("password").value = "";
+                        document.getElementById("action").value = "edit";
+                    }
+                    function deleteInfo($event){
+                        const user_id = $event.target.id.substring($event.target.id.length-1, $event.target.id.length);
+                        document.getElementById("user_id").value = user_id;
+                        document.getElementById("password").value = "";
+                        document.getElementById("action").value = "delete";
                     }
                     function closeAlertMSG(){
                         document.getElementById("wrongPW").hidden = true;
                     }
                 </script>
-                <!-- Modal -->
                 
                 <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true" data-backdrop="static">
                     <div class="modal-dialog">
@@ -155,37 +153,49 @@
                             <div class="modal-body">
                             <form action="" method="post">
                                 <input name="user_id" id="user_id" type="hidden" class="form-control" value="">
+                                <input name="action" id="action" type="hidden" class="form-control" value="">
                                 <div class="form-group">
                                     <label for="password">Password:</label>
                                     <input name="password" id="password" type="password" class="form-control" value="" required>
                                 </div>
-                                <?php
-                                    if(!$correct_password){
-                                        echo "<p id='wrongPW' style='color:red;' hidden>Incorrect Password</p>";
-                                    }
-                                ?>
+                                <p id="wrongPW" style="color:red;" hidden>Incorrect Password</p>
                                 <input class="btn btn-secondary" name="submit" type="submit"/>
                             </form>
                             </div>
-                            <!-- <div class="modal-footer"> -->
-                            <!-- </div> -->
                         </div>
                     </div>
-                </div>
                 <?php
                     if(!$correct_password){
+                        if($_POST['action'] == 'edit'){
+                            echo "
+                                <script>
+                                    document.getElementById('user_id').value = ".$user_id.";
+                                    document.getElementById('password').value = '';
+                                    document.getElementById('action').value = 'edit';
+                                </script>
+                                  ";
+                        }
+                        else{
+                            echo "
+                            <script>
+                                document.getElementById('user_id').value = ".$user_id.";
+                                document.getElementById('password').value = '';
+                                document.getElementById('action').value = 'delete';
+                            </script>
+                                  ";
+                        }
                         echo "
-                                    <script>
-                                        document.getElementById('wrongPW').hidden = false;
-                                        $('#passwordModal').modal('show');
-                                    </script>
-                                      ";
+                            <script>
+                                document.getElementById('wrongPW').hidden = false;
+                                $('#passwordModal').modal('show');
+                            </script>
+                              ";
                     }
                 ?>
             </main>
-            <footer>
-              <p> &copy; 2020 COMP1006 - Course Project Phase One</p>
-            </footer>
-        </div><!--end container-->
+            <?php
+                require_once('footer.php');
+            ?>
     </body>
 </html>
+<?php ob_flush() ?>
