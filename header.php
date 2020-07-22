@@ -13,17 +13,6 @@
                               <a class='nav-link' href='login.php'>Login</a>
                         </li>
                         ";
-      }else if(!empty($_SESSION['account_id']) && empty($_SESSION['name'])){
-            $extension = "<li class='nav-item'>
-                              <a class='nav-link' href='profile.php'>My Info</a>
-                        </li>
-                        <li class='nav-item'>
-                              <a class='nav-link' href='view.php'>Network</a>
-                        </li>
-                        <li class='nav-item'>
-                              <a class='nav-link' href='destroy.php'>Logout</a>
-                        </li>
-                        ";
       }else {
             $extension = "<li class='nav-item'>
                               <a class='nav-link' href='profile.php'>My Info</a>

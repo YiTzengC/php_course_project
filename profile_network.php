@@ -46,5 +46,6 @@
 <div class="row">
     <div class="col" style="text-align: center;">
         <a href='add.php' class='btn btn-outline-light'>UPDATE</a>
+        <a href='delete.php' class='btn btn-outline-light'>DISCONNECT</a>
     </div>
 </div>

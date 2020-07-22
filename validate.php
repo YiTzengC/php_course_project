@@ -29,10 +29,10 @@
             if ($statement->rowCount() == 1) {
                 $row = $statement->fetch();
                 $statement->closeCursor();
-                $_SESSION['account_id'] = $row['account_id'];
                 $hashed_password = $row['password'];
                 if (password_verify($user_password, $hashed_password)) {
                     //password matches
+                    $_SESSION['account_id'] = $row['account_id'];
                     $_SESSION['username'] = $row['username'];
                     $sql = "SELECT * FROM users WHERE user_id = :user_id;";
                     $statement = $db->prepare($sql); 
