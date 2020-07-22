@@ -20,7 +20,7 @@
             <section id="intro">
                 <h2>Project Review</h2>
                 <p>
-                Course phase two was much trickier than the first one. We have to carry out the search function, which took me longer than I expected. At this project, I also learned how to secure my data rather than using plain text for password and stored sensitive data in safer places like SESSION. Overall, it was a good challenge from phase one to phase two. I completely know how to build a web application using PHP. Thank you. 
+                Project phase two was much trickier than the first one. We have to carry out the search function, which took me longer than I expected. At this project, I also learned how to secure my data rather than using plain text for password and stored sensitive data in safer places like SESSION. Overall, it was a good challenge from phase one to phase two. I completely know how to build a web application using PHP. Thank you. 
                 </p>
             </section>
         </main>

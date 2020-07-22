@@ -1,12 +1,10 @@
 <?php
-      //authentication
-      // check status of session 
-      // start session if it is not active
       if(session_status() != PHP_SESSION_ACTIVE){
             session_start();
       }
+      
       $extension = "";
-      //obtain info from session
+
       if(empty($_SESSION['account_id']) && empty($_SESSION['name'])){
             $extension = "<li class='nav-item'>
                               <a class='nav-link' href='register.php'>Register</a>

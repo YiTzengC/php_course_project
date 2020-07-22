@@ -1,6 +1,4 @@
 <?php
-
-    //create variables to store form data
     $anchor = "register.php";
     $user = trim(filter_input(INPUT_POST, 'username'));
     $user_password = trim(filter_input(INPUT_POST, 'password'));
@@ -18,42 +16,27 @@
     }
     else {
         try {
-            // add a comment to explain the line of code below
-            //run script of connect.php
             require_once('db/connect.php');
             $sql = "INSERT INTO accounts (username, password) VALUES (:username, :password)";
-            // add a comment to explain the line of code below
-            // instantiate a variable called sql to hold query to be executed for mysql
-            // add a comment to explain the line of code below
-            //papare the query and return a PDO statement object
-            $statement = $db->prepare($sql); // fill in the correct method
-            // add a comment to explain the line of code below
-            //bind value to the named placeholders
+            $statement = $db->prepare($sql);
             $statement->bindParam(':username', $user);
             $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
             $statement->bindParam(':password', $hashed_password);
-            // add a comment to explain the line of code below
-            // execute the query
-            $statement->execute(); // fill in the correct method
+            $statement->execute(); 
 
             $alert_msg="Registered Successfully!";
-            
-            // add a comment to explain the line of code below
-            // disconnect from database
+
             $statement ->closeCursor();
             $anchor = "login.php";
             
         } catch (PDOException $e) {
             $error_message = $e->getMessage();
-            //show error message to user
-            // echo $error_message;
             if(strpos($error_message, "Duplicate entry") != false){
                 $alert_msg="Username exists! Please provide a new one.";
             }
             else{
                 $alert_msg="Sorry! We weren't able to process your submission at this time. We've alerted our admins and will let you know when things are fixed!".$error_message;
             }
-            //email app admin with error
             mail('200437546@student.georgianc.on.ca', 'App Error ', 'Error :'. $error_message);
         }
     }

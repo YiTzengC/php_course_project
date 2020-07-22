@@ -19,8 +19,6 @@
     else {
         try {
             require_once('db/connect.php');
-            //validate account
-            //set up query to see if a username matches
             $sql = "SELECT account_id, username, password FROM accounts WHERE username = :username";
             //prepare
             $statement = $db->prepare($sql);
@@ -70,8 +68,6 @@
             $error_message = $e->getMessage();
             //show error message to user
             $alert_msg = "Sorry! We weren't able to process your submission at this time. We've alerted our admins and will let you know when things are fixed!";
-            // echo $error_message;
-            //email app admin with error
             mail('200437546@student.georgianc.on.ca', 'App Error ', 'Error :'. $error_message);
         }
     }
