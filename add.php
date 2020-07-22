@@ -20,15 +20,15 @@
             <form method="post" action="process.php" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="name">Name:</label>
-                    <input name="name" id="name" type="text" class="form-control" value="<?php echo $_SESSION['name']; ?>" required>
+                    <input name="name" id="name" type="text" class="form-control" value="<?php echo empty($_SESSION['name'])?"":$_SESSION['name']; ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="email">Email:</label>
-                    <input name="email" id="email" type="email" class="form-control" value="<?php echo $_SESSION['email']; ?>" required>
+                    <input name="email" id="email" type="email" class="form-control" value="<?php echo empty($_SESSION['email'])?"":$_SESSION['email']; ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="location">Location:</label>
-                    <input name="location" id="location" type="text" class="form-control" value="<?php echo $_SESSION['location']; ?>" required>
+                    <input name="location" id="location" type="text" class="form-control" value="<?php echo empty($_SESSION['location'])?"":$_SESSION['location']; ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="photo" >Profile Photo:</label>
@@ -36,7 +36,7 @@
                 </div>
                 <div class="form-group">
                     <label for="social_media">Social Media URL:</label>
-                    <input name="social_media" id="social_media" type="url" class="form-control" value="<?php echo $_SESSION['link']; ?>" required>
+                    <input name="social_media" id="social_media" type="url" class="form-control" value="<?php echo empty($_SESSION['link'])?"":$_SESSION['link']; ?>" required>
                 </div>
                 <div class="form-group" id="skill_list">
                     <label for="skills">Skills:</label>

@@ -1,0 +1,38 @@
+body {
+    background-image: url("../imgs/clouds-cold-frost-frosty-540518.jpg");
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+main {
+    padding: 2em 0 2em 0;
+    
+}
+.tbl {
+    background-color: rgba(66, 66, 66, 0.5);
+    width: 55%;
+    margin: auto auto;
+    border-radius: .5em;
+    padding: .5em .5em;
+}
+.table {
+    width: 90%;
+    margin: .4em auto;
+}
+table tr {
+    color: white;
+}
+table tbody tr th{
+    width: 25%;
+    /* text-align: right; */
+}
+table tbody tr td span{
+    margin: 0em .1em;
+    /* text-align: right; */
+}
+/* table tbody td {
+    vertical-align: middle !important;
+}
+table tr:hover {
+    background-color: gray;
+} */

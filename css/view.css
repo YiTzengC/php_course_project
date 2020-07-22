@@ -1,21 +1,40 @@
 body {
-   background: linear-gradient(#71cbcf, #3C6E71);
-   background-repeat: no-repeat;
+    background-image: url("../imgs/woman-in-red-long-sleeve-shirt-wearing-eyeglasses-using-3791130.jpg");
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 main {
-    padding: 3em 0 30em 0;
+    padding: 3em 0 20em 0;
     
 }
 .tbl {
-    background-color: rgba(128, 128, 128, 0.74);
+    background-color: rgba(66, 63, 63, 0.562);
     width: 90%;
     margin: auto auto;
     border-radius: .5em;
-    padding: 1em 1em;
+    padding: 4em 5em;
+}
+.search {
+    /* background-color: rgba(66, 63, 63, 0.562); */
+    width: 90%;
+    margin: auto auto;
+    /* border-radius: .5em;
+    padding: 4em 5em; */
+}
+.table {
+    margin: 0em;
 }
 table tr {
     color: white;
 }
-table td div {
-    color: #3C6E71;
+table tbody td {
+    vertical-align: middle !important;
+}
+table tbody tr:hover {
+    background-color: gray;
+    /* color: black; */
+}
+.modal-dialog .modal-content .modal-body span{
+    margin: 0em .1em;
 }

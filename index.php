@@ -25,7 +25,7 @@
                 Want to be a part of us?
                 </p>
                 <div class="btn-align">
-                    <a class="btn btn-outline-light" href="add.php">Connect Now</a>
+                    <a class="btn btn-outline-light" href="login.php">Connect Now</a>
                 </div>
             </section>
         </main>

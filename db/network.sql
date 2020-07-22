@@ -3,7 +3,7 @@ CREATE DATABASE Yi200437546;
 USE Yi200437546; 
 CREATE TABLE `accounts` (
     `account_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `username` VARCHAR(50) NOT NULL,
+    `username` VARCHAR(50) UNIQUE NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     PRIMARY KEY (account_id)
 );

@@ -1,28 +1,64 @@
 <?php ob_start() ?>
 <?php
     require_once('auth.php');
-    try {
-        // fetch all records from users
-        require_once('db/connect.php');
-        $sql = "SELECT * FROM users WHERE user_id != :user_id;";
-        $statement = $db->prepare($sql); 
-        $statement->bindParam(':user_id', $_SESSION['account_id']);
-        $statement->execute(); 
-        $users = $statement->fetchAll();
-        $statement ->closeCursor(); 
-        // fetch all records from skills by primary key
-        $skills = null;
-        foreach($users as $user){
-            $sql = "SELECT skill_name FROM skills WHERE user = :user;";
+    $search = filter_input(INPUT_POST, 'search');
+    if(empty($search)){
+        try {
+            // fetch all records from users
+            require_once('db/connect.php');
+            $sql = "SELECT * FROM users WHERE user_id != :user_id;";
             $statement = $db->prepare($sql); 
-            $statement->bindParam(':user', $user['user_id']);
+            $statement->bindParam(':user_id', $_SESSION['account_id']);
             $statement->execute(); 
-            $skills[$user['user_id']] = $statement->fetchAll();
-            $statement ->closeCursor();
+            $users = $statement->fetchAll();
+            $statement ->closeCursor(); 
+            // fetch all records from skills by primary key
+            $skills = null;
+            foreach($users as $user){
+                $sql = "SELECT skill_name FROM skills WHERE user = :user;";
+                $statement = $db->prepare($sql); 
+                $statement->bindParam(':user', $user['user_id']);
+                $statement->execute(); 
+                $skills[$user['user_id']] = $statement->fetchAll();
+                $statement ->closeCursor();
+            }
+        } catch (PDOException $e) {
+            $error_message = $e->getMessage();
+            echo $error_message;
         }
-    } catch (PDOException $e) {
-        $error_message = $e->getMessage();
-        echo $error_message;
+    }else{
+        $search_words = explode(' ', $search);
+        try {
+            
+            // fetch all records from users
+            require_once('db/connect.php');
+            $sql = "SELECT * FROM users WHERE ";
+            $where = "";
+            foreach($search_words as $word){
+                $word = trim($word);
+                $where = $where."name LIKE '%$word%' OR ";
+            }
+            $where = substr($where, 0, strlen($where) - 4);
+            $sql = $sql . $where.";";
+            // echo $sql;
+            $statement = $db->prepare($sql); 
+            $statement->execute(); 
+            $users = $statement->fetchAll();
+            $statement ->closeCursor(); 
+            // fetch all records from skills by primary key
+            $skills = null;
+            foreach($users as $user){
+                $sql = "SELECT skill_name FROM skills WHERE user = :user;";
+                $statement = $db->prepare($sql); 
+                $statement->bindParam(':user', $user['user_id']);
+                $statement->execute(); 
+                $skills[$user['user_id']] = $statement->fetchAll();
+                $statement ->closeCursor();
+            }
+        } catch (PDOException $e) {
+            $error_message = $e->getMessage();
+            echo $error_message;
+        }
     }
 ?>
 
@@ -46,10 +82,21 @@
             require_once('header.php');
         ?>
             <main>
+            <div class="search">
+            <form class="input-group mb-3" action="view.php" method="post">
+                <input type="text" class="form-control" name="search" value="<?php echo empty($search)?"":$search; ?>" placeholder="Example: name name ..." aria-label="Recipient's username" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                  <input type="submit" class="btn btn-outline-secondary" type="button"></input>
+                </div>
+                <div class="input-group-append">
+                  <a href="view.php" class="btn btn-outline-danger" type="button">Clear</a>
+                </div>
+            </form>
+</div>
                 <div class="tbl">
                 <?php 
                     echo "
-                    <table class='table table-striped'>
+                    <table class='table'>
                         <thead>
                             <th scope='col'>Profile</th>
                             <th scope='col'>Name</th>
@@ -60,51 +107,50 @@
                         </thead>
                         <tbody>";
                         foreach($users as $index=>$user){
-                            echo "<tr><th scope='row'><img src='imgs/".$user['image']."' class='rounded-circle' style='width:10em;height:10em;'></th><td>" . $user['name'] . "</td><td>" . $user['email'] . "</td><td>".$user['location']. "</td><td><button class='btn btn-outline-light' data-toggle='modal' data-target='#skillModal' id='skill_".$user['user_id']."' onclick='skillInfo(event)'>Show</button></td><td><a class='btn btn-light' href='".$user['social_media']."'>Check</a></td></tr>";
+                            echo "<tr>
+                                    <th scope='row'>
+                                        <img src='imgs/".$user['image']."' class='rounded-circle' style='width:5em;height:5em;'>
+                                    </th>
+                                    <td>".$user['name']. "</td>
+                                    <td>".$user['email']. "</td>
+                                    <td>".$user['location']. "</td>
+                                    <td>
+                                        <button class='btn btn-outline-light' data-toggle='modal' data-target='#skillModal".$user['user_id']."'>Show</button>
+                                    </td>
+                                    <td>
+                                        <a class='btn btn-outline-light' href='".$user['social_media']."' target='_blank' rel='external'>Check</a>
+                                    </td>
+                                </tr>";
                         }
                         echo "</tbody>
                     </table>";
                 ?>
                 </div>
-                <script> 
-                    function skillInfo($event){
-                        const user_id = $event.target.id.substring($event.target.id.length-1, $event.target.id.length);
-                        document.getElementById("user_id").value = user_id;
-                        document.getElementById("password").value = "";
-                        document.getElementById("action").value = "edit";
-                    }
-                    function deleteInfo($event){
-                        const user_id = $event.target.id.substring($event.target.id.length-1, $event.target.id.length);
-                        document.getElementById("user_id").value = user_id;
-                        document.getElementById("password").value = "";
-                        document.getElementById("action").value = "delete";
-                    }
-                    function closeAlertMSG(){
-                        document.getElementById("wrongPW").hidden = true;
-                    }
-                </script>
-                
-                <div class="modal fade" id="skillModal" tabindex="-1" role="dialog" aria-labelledby="skillModalLabel" aria-hidden="true" data-backdrop="static">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="skillModalLabel">Skill Set</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeAlertMSG()">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                            <form action="" method="post">
-                                <input name="user_id" id="user_id" type="hidden" class="form-control" value="">
-                                <input name="action" id="action" type="hidden" class="form-control" value="">
-                                <div class="form-group">
-                                    <label for="password">Password:</label>
-                                    <input name="password" id="password" type="password" class="form-control" value="" required>
+                <?php
+                    if(!empty($skills)){
+                        foreach($skills as $skill_index => $skill_set){
+                            echo "<div class='modal fade' id='skillModal".$skill_index."' tabindex='-1' role='dialog' aria-labelledby='skillModalLabel' aria-hidden='true'>
+                            <div class='modal-dialog'>
+                                <div class='modal-content'>
+                                  <div class='modal-header'>
+                                    <h5 class='modal-title' id='skillModalLabel'>Skill Set</h5>
+                                  </div>
+                                  <div class='modal-body'>
+                                      ";
+                                      foreach($skill_set as $skill){
+                                        echo "<span class='badge badge-secondary'>".$skill['skill_name']."</span>";
+                                    }
+                            echo"
+                                  </div>
+                                  <div class='modal-footer'>
+                                      <button type='button' data-dismiss='modal' class='btn btn-secondary'>Close</button>
+                                  </div>
                                 </div>
-                            </form>
                             </div>
-                        </div>
-                    </div>
+                        </div>";
+                        }
+                    }
+                ?>
             </main>
             <?php
                 require_once('footer.php');

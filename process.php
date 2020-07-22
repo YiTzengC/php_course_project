@@ -1,4 +1,3 @@
-
 <?php 
     if(session_status() != PHP_SESSION_ACTIVE){
         session_start();
@@ -16,6 +15,7 @@
     </head>
     <body>
     <?php
+    $alert_msg = "";
     $user_id = null;
     $account_id = $_SESSION['account_id'];
     $name = filter_input(INPUT_POST, 'name');
@@ -23,17 +23,15 @@
     $social_media = filter_input(INPUT_POST, 'social_media');
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $skills = filter_input(INPUT_POST, 'skills', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
-    $photo = $_FILES['photo']['name'];
+    $photo = $account_id.'_'.$_FILES['photo']['name'];
     $photo_type = $_FILES['photo']['type'];
     $photo_size = $_FILES['photo']['size'];
-    $alert_msg = "";
 
     define('UPLOADPATH', 'imgs/');
     define('MAXFILESIZE', 32786); //32 KB
 
     if (empty($name)) {
         $alert_msg = "Please provide name!";
-        
     }
     else if (empty($location)){
         $alert_msg = "Please provide location!";
@@ -128,7 +126,7 @@
                 </div>
             </div>
             <script>
-                $('#alertModal').modal('show');
+                // $('#alertModal').modal('show');
             </script>
     </body>
 </html>
