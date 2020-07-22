@@ -6,7 +6,7 @@
         try {
             // fetch all records from users
             require_once('db/connect.php');
-            $sql = "SELECT * FROM users WHERE user_id != :user_id;";
+            $sql = "SELECT * FROM users";
             $statement = $db->prepare($sql); 
             $statement->bindParam(':user_id', $_SESSION['account_id']);
             $statement->execute(); 
