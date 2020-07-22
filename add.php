@@ -1,42 +1,3 @@
-<?php
-    $id = null;
-    $id = filter_input(INPUT_GET, 'id');
-    $name = null;
-    $email = null;
-    $location = null;
-    $skills = null;
-    if(!empty($id)){
-        try {
-            require_once('db/connect.php');
-            $sql = "SELECT * FROM users WHERE user_id = :user_id;";
-            $statement = $db->prepare($sql);
-            $statement->bindParam(':user_id', $id);
-            $statement->execute();
-            $users = $statement->fetchAll();
-            foreach($users as $user){
-                $name = $user['name'];
-                $email = $user['email'];
-                $location = $user['location'];
-            }
-            
-            $statement ->closeCursor(); 
-
-            foreach($users as $user){
-                $sql = "SELECT skill_name FROM skills WHERE owner = :owner;";
-                $statement = $db->prepare($sql); 
-                $statement->bindParam(':owner', $user['user_id']);
-                $statement->execute(); 
-                $skills = $statement->fetchAll();
-                $statement ->closeCursor();
-            }
-    
-    
-        } catch (PDOException $e) {
-            $error_message = $e->getMessage();
-            echo $error_message;
-        }
-    }
-?>
 
 <!DOCTYPE html>
     <html>
@@ -56,50 +17,42 @@
             require_once('header.php');
         ?>
         <main>
-            <form method="post" action="process.php">
-            <input name="user_id" id="user_id" type="hidden" class="form-control" value="<?php echo $id?>" required>
+            <form method="post" action="process.php" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="name">Name:</label>
-                    <input name="name" id="name" type="text" class="form-control" value="<?php echo $name?>" required>
+                    <input name="name" id="name" type="text" class="form-control" value="<?php echo $_SESSION['name']; ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="email">Email:</label>
-                    <input name="email" id="email" type="email" class="form-control" value="<?php echo $email?>" required>
+                    <input name="email" id="email" type="email" class="form-control" value="<?php echo $_SESSION['email']; ?>" required>
                 </div>
                 <div class="form-group">
-                    <label for="location">City:</label>
-                    <input name="location" id="location" type="text" class="form-control" value="<?php echo $location?>" required>
+                    <label for="location">Location:</label>
+                    <input name="location" id="location" type="text" class="form-control" value="<?php echo $_SESSION['location']; ?>" required>
                 </div>
-                <?php
-                    if(empty($id)){
-                        echo "<div class='form-group'>
-                            <label for='password'>Password:</label>
-                            <input name='password' id='password' type='password' class='form-control' required>
-                            </div>";
-                    }
-                ?>
+                <div class="form-group">
+                    <label for="photo" >Profile Photo:</label>
+                    <input id="profile_photo" type="file" name="photo" required>
+                </div>
+                <div class="form-group">
+                    <label for="social_media">Social Media URL:</label>
+                    <input name="social_media" id="social_media" type="url" class="form-control" value="<?php echo $_SESSION['link']; ?>" required>
+                </div>
                 <div class="form-group" id="skill_list">
                     <label for="skills">Skills:</label>
                     <button class="btn btn-light btn-sm" type="button" onclick="addBlank()">Add</button>
                 </div>
                 <?php
-                    if(!empty($skills) && !empty($id)){
-                        foreach($skills as $skill){
+                    if(!empty($_SESSION['skills'])){
+                        foreach($_SESSION['skills'] as $skill){
                             echo "<div class='input-group mb-3'><input name='skills[]' class='form-control skill' type='text' value='".$skill['skill_name']."'><div class='input-group-append'><button class='btn btn-outline-info' type='button' onclick='dropItem(event)'>Drop</button></div></div>";
                         }
                     }
-                    
-                    if(empty($id)){
-                        echo "<div class='btn-align'>
-                                <input type='submit' class='btn btn-secondary' value= 'Share'>
-                            </div>";
-                    }else{
-                        echo "<div class='btn-align'>
-                                <input type='submit' class='btn btn-secondary' value= 'Save'>
-                                <a href='view.php' class='btn btn-danger'> Cancel </a>
-                            </div>";
-                    }
-                ?> 
+                ?>
+                <div class='btn-align'>
+                    <input type='submit' class='btn btn-secondary' value= 'Save'>
+                    <a href='profile.php' class='btn btn-danger'> Cancel </a>
+                </div>
             <form>
             <script>
                 function dropItem($event) {

@@ -1,3 +1,9 @@
+
+<?php 
+    if(session_status() != PHP_SESSION_ACTIVE){
+        session_start();
+    }
+?>
 <!DOCTYPE html>
     <html>
     <head>
@@ -10,109 +16,119 @@
     </head>
     <body>
     <?php
-    $id = null;
-    $id = filter_input(INPUT_POST, 'user_id');
+    $user_id = null;
+    $account_id = $_SESSION['account_id'];
     $name = filter_input(INPUT_POST, 'name');
     $location = filter_input(INPUT_POST, 'location');
-    $user_password = filter_input(INPUT_POST, 'password');
+    $social_media = filter_input(INPUT_POST, 'social_media');
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $skills = filter_input(INPUT_POST, 'skills', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+    $photo = $_FILES['photo']['name'];
+    $photo_type = $_FILES['photo']['type'];
+    $photo_size = $_FILES['photo']['size'];
+    $alert_msg = "";
 
-    $ok = true;
+    define('UPLOADPATH', 'imgs/');
+    define('MAXFILESIZE', 32786); //32 KB
+
     if (empty($name)) {
-        echo "<p>Please provide name! </p>";
-        $ok = false;
-
+        $alert_msg = "Please provide name!";
+        
     }
     else if (empty($location)){
-        echo "<p>Please provide location! </p>";
-        $ok = false;
+        $alert_msg = "Please provide location!";
     }
-    else if (empty($user_password) && empty($id)){
-        echo "<p>Please provide password! </p>";
-        $ok = false;
+    else if (empty($email)){
+        $alert_msg = "Please provide email!";
+    }
+    else if (empty($social_media)){
+        $alert_msg = "Please provide url to your social media!";
+    }
+    else if ((($photo_type !== 'image/gif') || ($photo_type !== 'image/jpeg') || ($photo_type !== 'image/jpg') || ($photo_type !== 'image/png')) && ($photo_size < 0) && ($photo_size >= MAXFILESIZE)){
+        if ($_FILES['photo']['error'] !== 0) {
+            $alert_msg = "Please submit a photo that is a jpg, png or gif and less than 32kb";
+        }
     }
     else {
-        $user_password = md5($user_password);
-    }
-    if(!empty($skills)){
-        foreach($skills as $skill){
-            if(empty($skill)){
-                $ok = false;
-            }
-        }
-    };
-    if($ok){
         try{
             require_once("db/connect.php");
-            if(!empty($id)){
-                $sql = "UPDATE users SET name = :name, location = :location, email = :email WHERE user_id = :user_id;";
+            if(!empty($_SESSION['name'])){
+                if($photo != $_SESSION['image'] && $_SESSION['image'] != 'user.png'){
+                    $target = UPLOADPATH . $photo;
+                    unlink(UPLOADPATH.$_SESSION['image']);
+                    move_uploaded_file($_FILES['photo']['tmp_name'], $target);
+                }
+                $sql = "UPDATE users SET name = :name, location = :location, email = :email, image = :image, social_media = :social_media WHERE user_id = :user_id;";
                 $statement = $db->prepare($sql);
                 $statement->bindParam(':name', $name);
                 $statement->bindParam(':location', $location);
                 $statement->bindParam(':email', $email);
-                $statement->bindParam(':user_id', $id );
+                $statement->bindValue(':image', $photo);
+                $statement->bindParam(':user_id', $account_id );
+                $statement->bindValue(':social_media', $social_media);
                 $statement->execute(); 
                 $statement ->closeCursor();
-
-                $sql = "DELETE FROM skills WHERE owner = :user_id;"; 
+                
+                $sql = "DELETE FROM skills WHERE user = :user_id;"; 
                 $statement = $db->prepare($sql);
-                $statement->bindParam(':user_id', $id );
+                $statement->bindParam(':user_id', $account_id );
                 $statement->execute();
                 $statement->closeCursor(); 
             }
             else{
-                $sql = "INSERT INTO users (name, location, email, password) VALUES (:name, :location, :email, :password)";
+                $target = UPLOADPATH . $photo;
+                move_uploaded_file($_FILES['photo']['tmp_name'], $target);
+
+                $sql = "INSERT INTO users (user_id, name, location, email, image, social_media) VALUES (:user_id, :name, :location, :email, :image, :social_media)";
                 $statement = $db->prepare($sql);
-                $statement->bindParam(':name', $name);
-                $statement->bindParam(':location', $location);
-                $statement->bindParam(':email', $email);
-                $statement->bindParam(':password', $user_password);
-                $statement->execute(); 
-                $id = $db->lastInsertId();
+                $statement->bindParam(':user_id', $account_id);
+                $statement->bindValue(':name', $name);
+                $statement->bindValue(':location', $location);
+                $statement->bindValue(':email', $email);
+                $statement->bindValue(':image', $photo);
+                $statement->bindValue(':social_media', $social_media);
+                $statement->execute();
                 $statement ->closeCursor();
-    
             }
             if(!empty($skills)){
                 $skills = array_unique($skills);
                 foreach($skills as $skill){
-                    $sql = "INSERT INTO skills (skill_name, owner) VALUES (:skill_name, :owner)";
+                    $sql = "INSERT INTO skills (skill_name, user) VALUES (:skill_name, :user)";
                     $statement = $db->prepare($sql);
                     $statement->bindParam(':skill_name', $skill);
-                    $statement->bindParam(':owner', $id);
+                    $statement->bindParam(':user', $account_id);
                     $statement->execute(); 
                     $statement ->closeCursor();
                 }
             }
-            echo "
-            <div class='modal fade' id='exampleModal' tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true'>
-            <div class='modal-dialog'>
-              <div class='modal-content'>
-                <div class='modal-header'>
-                  <h5 class='modal-title' id='exampleModalLabel'>You Are Connecred</h5>
-                </div>
-                <div class='modal-body'>
-                    Thank you for sharing.
-                </div>
-                <div class='modal-footer'>
-                  <a href='view.php' class='btn btn-primary'>Got It</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <script>
-              $('#exampleModal').modal('show');
-          </script>
-            ";
+            header('location:profile.php');
         } catch (PDOException $e) {
             $error_message = $e->getMessage();
-            echo "<p> Sorry! We weren't able to process your submission at this time. We've alerted our admins and will let you know when things are fixed! </p> ";
-            echo $error_message;
+            $alert_msg = "Sorry! We weren't able to process your submission at this time. We've alerted our admins and will let you know when things are fixed!";
+            // echo $error_message;
             mail('200437546@student.georgianc.on.ca', 'App Error ', 'Error :'. $error_message);
         }
     }
-    
-    
 ?>
+<div class='modal fade' id='alertModal' tabindex='-1' role='dialog' aria-labelledby='alertModalLabel' aria-hidden='true'>
+                <div class='modal-dialog'>
+                    <div class='modal-content'>
+                      <div class='modal-header'>
+                        <h5 class='modal-title' id='alertModalLabel'>Notification</h5>
+                      </div>
+                      <div class='modal-body'>
+                          <?php
+                              echo $alert_msg;
+                          ?>
+                      </div>
+                      <div class='modal-footer'>
+                          <a href="add.php" class='btn btn-secondary'>OK</a>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $('#alertModal').modal('show');
+            </script>
     </body>
 </html>

@@ -1,26 +1,25 @@
 <?php ob_start() ?>
 <?php
-    $correct_password = true;
+    require_once('auth.php');
     try {
         // fetch all records from users
         require_once('db/connect.php');
-        $sql = "SELECT * FROM users;";
+        $sql = "SELECT * FROM users WHERE user_id != :user_id;";
         $statement = $db->prepare($sql); 
+        $statement->bindParam(':user_id', $_SESSION['account_id']);
         $statement->execute(); 
         $users = $statement->fetchAll();
         $statement ->closeCursor(); 
         // fetch all records from skills by primary key
         $skills = null;
         foreach($users as $user){
-            $sql = "SELECT skill_name FROM skills WHERE owner = :owner;";
+            $sql = "SELECT skill_name FROM skills WHERE user = :user;";
             $statement = $db->prepare($sql); 
-            $statement->bindParam(':owner', $user['user_id']);
+            $statement->bindParam(':user', $user['user_id']);
             $statement->execute(); 
             $skills[$user['user_id']] = $statement->fetchAll();
             $statement ->closeCursor();
         }
-
-
     } catch (PDOException $e) {
         $error_message = $e->getMessage();
         echo $error_message;
@@ -52,79 +51,23 @@
                     echo "
                     <table class='table table-striped'>
                         <thead>
-                            <th scope='col'>#</th>
+                            <th scope='col'>Profile</th>
                             <th scope='col'>Name</th>
                             <th scope='col'>Email</th>
                             <th scope='col'>Location</th>
                             <th scope='col'>Skills</th>
-                            <th scope='col'> Delete</th>
-                            <th scope='col'> Edit </th>
+                            <th scope='col'>Social Media</th>
                         </thead>
                         <tbody>";
                         foreach($users as $index=>$user){
-                            echo "<tr><th scope='row'>".($index+1)."</th><td>" . $user['name'] . "</td><td>" . $user['email'] . "</td><td>".$user['location']. "</td><td><button class='btn btn-light' type='button' data-toggle='collapse' data-target='#skill_".$index."' aria-expanded='false' aria-controls='skill_".$index."'>Show</button></td><td><a class='btn btn-outline-light' data-toggle='modal' data-target='#passwordModal' id='delete_".$user['user_id']."' onclick='deleteInfo(event)'> Delete</a></td><td><button class='btn btn-light' type='button' data-toggle='modal' data-target='#passwordModal' id='user_".$user['user_id']."' onclick='editInfo(event)'>Edit</button></td></tr>";
-                            echo "<tr class='collapse' id='skill_".$index."'>
-                            <td colspan='7'><div class='card card-body'><ul class='list-group list-group-horizontal'>";
-                            if(!empty($skills[$user['user_id']])){
-                                foreach($skills[$user['user_id']] as $skname){
-                                    echo "<li class='list-group-item'>".$skname['skill_name']."</li>";
-                                }
-                            }
-                            echo "</ul></div></td></tr>";
+                            echo "<tr><th scope='row'><img src='imgs/".$user['image']."' class='rounded-circle' style='width:10em;height:10em;'></th><td>" . $user['name'] . "</td><td>" . $user['email'] . "</td><td>".$user['location']. "</td><td><button class='btn btn-outline-light' data-toggle='modal' data-target='#skillModal' id='skill_".$user['user_id']."' onclick='skillInfo(event)'>Show</button></td><td><a class='btn btn-light' href='".$user['social_media']."'>Check</a></td></tr>";
                         }
                         echo "</tbody>
                     </table>";
                 ?>
-                <?php
-                    if (isset($_POST['submit'])) {
-                        $user_password = md5($_POST['password']);
-                        $user_id = $_POST['user_id'];
-                        try {
-                            $sql = "SELECT * FROM users WHERE user_id = :user_id AND password = :password;";
-                            $statement = $db->prepare($sql);
-                            $statement->bindParam(':user_id', $user_id);
-                            $statement->bindParam(':password', $user_password);
-                            $statement->execute();
-                            $records = $statement->fetchAll();
-                            $statement ->closeCursor();
-                            if(empty($records)){
-                                $correct_password = false;
-                            }
-                            else{
-                                if($_POST['action'] == 'edit'){
-                                    header('location: add.php?id='.$user_id);
-                                }
-                                else{
-                                    header('location: db/remove.php?id='.$user_id);
-                                }
-                            }
-                        }catch(PDOException $e){
-                            echo "
-                                <div class='modal fade' id='errorModal' tabindex='-1' role='dialog' aria-labelledby='errorModalLabel' aria-hidden='true'>
-                                <div class='modal-dialog'>
-                                  <div class='modal-content'>
-                                    <div class='modal-header'>
-                                      <h5 class='modal-title' id='errorModalLabel'>ERROR</h5>
-                                    </div>
-                                    <div class='modal-body'>
-                                        Unexpected Error occurs:".$e->getMessage()."
-                                    </div>
-                                    <div class='modal-footer'>
-                                        <button type='button' class='btn btn-secondary' data-dismiss='modal'>OK</button>
-                                    </div>
-                                  </div>
-                                </div>
-                                </div>
-                                <script>
-                                    $('#errorModal').modal('show');
-                                </script>
-                                  ";
-                        }
-                    }
-                ?>
                 </div>
                 <script> 
-                    function editInfo($event){
+                    function skillInfo($event){
                         const user_id = $event.target.id.substring($event.target.id.length-1, $event.target.id.length);
                         document.getElementById("user_id").value = user_id;
                         document.getElementById("password").value = "";
@@ -141,11 +84,11 @@
                     }
                 </script>
                 
-                <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal fade" id="skillModal" tabindex="-1" role="dialog" aria-labelledby="skillModalLabel" aria-hidden="true" data-backdrop="static">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="passwordModalLabel">Password Required To Edit</h5>
+                                <h5 class="modal-title" id="skillModalLabel">Skill Set</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeAlertMSG()">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -158,40 +101,10 @@
                                     <label for="password">Password:</label>
                                     <input name="password" id="password" type="password" class="form-control" value="" required>
                                 </div>
-                                <p id="wrongPW" style="color:red;" hidden>Incorrect Password</p>
-                                <input class="btn btn-secondary" name="submit" type="submit"/>
                             </form>
                             </div>
                         </div>
                     </div>
-                <?php
-                    if(!$correct_password){
-                        if($_POST['action'] == 'edit'){
-                            echo "
-                                <script>
-                                    document.getElementById('user_id').value = ".$user_id.";
-                                    document.getElementById('password').value = '';
-                                    document.getElementById('action').value = 'edit';
-                                </script>
-                                  ";
-                        }
-                        else{
-                            echo "
-                            <script>
-                                document.getElementById('user_id').value = ".$user_id.";
-                                document.getElementById('password').value = '';
-                                document.getElementById('action').value = 'delete';
-                            </script>
-                                  ";
-                        }
-                        echo "
-                            <script>
-                                document.getElementById('wrongPW').hidden = false;
-                                $('#passwordModal').modal('show');
-                            </script>
-                              ";
-                    }
-                ?>
             </main>
             <?php
                 require_once('footer.php');
