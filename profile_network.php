@@ -32,7 +32,7 @@
     </tr>
     <tr class="table-active">
       <th scope="row"></th>
-      <th>SKILL</th>
+      <td>SKILL</td>
       <td>
         <?php 
             foreach($_SESSION['skills'] as $skill){

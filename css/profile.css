@@ -1,5 +1,5 @@
 body {
-    background-image: url("../imgs/clouds-cold-frost-frosty-540518.jpg");
+    background-image: url("../imgs/nature-forest-trees-fog-4827.jpg");
     background-attachment: fixed;
     background-repeat: no-repeat;
     background-size: cover;
@@ -10,20 +10,20 @@ main {
 }
 .tbl {
     background-color: rgba(66, 66, 66, 0.5);
-    width: 55%;
-    margin: auto auto;
+    width: 60%;
+    margin: 2em auto;
     border-radius: .5em;
-    padding: .5em .5em;
+    padding: 2em .5em;
 }
 .table {
     width: 90%;
-    margin: .4em auto;
+    margin: 1em auto;
 }
 table tr {
     color: white;
 }
 table tbody tr th{
-    width: 25%;
+    width:20%;
     /* text-align: right; */
 }
 table tbody tr td span{

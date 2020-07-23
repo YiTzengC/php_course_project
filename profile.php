@@ -37,7 +37,7 @@
                         echo "
                         <div class='row'>
                             <div class='col' style='text-align: center;'>
-                            <a href='add.php' class='btn btn-outline-light'>Share Connection</a>
+                            <a href='add.php' class='btn btn-outline-light' style='margin-top:1em;'>Share Connection</a>
                             </div>
                         </div>";
                     }
