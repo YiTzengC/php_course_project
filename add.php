@@ -40,7 +40,7 @@
                 </div>
                 <div class="form-group" id="skill_list">
                     <label for="skills">Skills:</label>
-                    <button class="btn btn-light btn-sm" type="button" onclick="addBlank()">Add</button>
+                    <button class="btn btn-outline-light" type="button" onclick="addBlank()">Add</button>
                 </div>
                 <?php
                     if(!empty($_SESSION['skills'])){
