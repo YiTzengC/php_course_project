@@ -7,8 +7,6 @@ CREATE TABLE `accounts` (
     `password` VARCHAR(255) NOT NULL,
     PRIMARY KEY (account_id)
 );
-DROP TABLE skills;
-DROP TABLE users;
 
 CREATE TABLE `users` (
   `user_id`   BIGINT UNSIGNED NOT NULL,

@@ -29,8 +29,10 @@
 
     define('UPLOADPATH', 'imgs/');
     define('MAXFILESIZE', 32786); //32 KB
-
-    if (empty($name)) {
+    if($_SERVER['CONTENT_LENGTH'] > 8388608){
+        $alert_msg = "Please upload image size less than 8MB";
+    }
+    else if (empty($name)) {
         $alert_msg = "Please provide name!";
     }
     else if (empty($location)){
@@ -42,7 +44,7 @@
     else if (empty($social_media)){
         $alert_msg = "Please provide url to your social media!";
     }
-    else if ((($photo_type !== 'image/gif') || ($photo_type !== 'image/jpeg') || ($photo_type !== 'image/jpg') || ($photo_type !== 'image/png')) && ($photo_size < 0) && ($photo_size >= MAXFILESIZE)){
+    else if ((($photo_type !== 'image/gif') || ($photo_type !== 'image/jpeg') || ($photo_type !== 'image/jpg') || ($photo_type !== 'image/png')) && ($photo_size < 0)){
         if ($_FILES['photo']['error'] !== 0) {
             $alert_msg = "Please submit a photo that is a jpg, png or gif and less than 32kb";
         }
@@ -89,8 +91,23 @@
                 $statement ->closeCursor();
             }
             if(!empty($skills)){
-                $skills = array_unique($skills);
+                $unhandled_skills = [];
                 foreach($skills as $skill){
+                    $exploded_by_comma = null;
+                    if(strpos($skill, ",") !== false){
+                        $exploded_by_comma = explode(',', $skill);
+                        $exploded_by_comma = array_unique($exploded_by_comma);
+                        foreach($exploded_by_comma as $explode_str){
+                            array_push($unhandled_skills, $explode_str);
+                        }
+                    }
+                    else{
+                        array_push($unhandled_skills, $skill);
+                    }
+                }
+                $unhandled_skills = array_unique($unhandled_skills);
+                
+                foreach($unhandled_skills as $skill){
                     $sql = "INSERT INTO skills (skill_name, user) VALUES (:skill_name, :user)";
                     $statement = $db->prepare($sql);
                     $statement->bindParam(':skill_name', $skill);
@@ -100,10 +117,10 @@
                 }
             }
             header('location:profile.php');
-        } catch (PDOException $e) {
+        }catch (PDOException $e) {
             $error_message = $e->getMessage();
-            $alert_msg = "Sorry! We weren't able to process your submission at this time. We've alerted our admins and will let you know when things are fixed!";
-            // echo $error_message;
+            // $alert_msg = "Sorry! We weren't able to process your submission at this time. We've alerted our admins and will let you know when things are fixed!";
+            echo $error_message;
             mail('200437546@student.georgianc.on.ca', 'App Error ', 'Error :'. $error_message);
         }
     }
@@ -126,7 +143,7 @@
                 </div>
             </div>
             <script>
-                // $('#alertModal').modal('show');
+                $('#alertModal').modal('show');
             </script>
     </body>
 </html>
